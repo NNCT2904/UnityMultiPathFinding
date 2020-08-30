@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
-using UnityEditorInternal;
 using UnityEngine;
 
 public class Pathfinding : MonoBehaviour
