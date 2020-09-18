@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Ignore this
 public class MoveTarget : MonoBehaviour
 {
     public LayerMask hitLayers;

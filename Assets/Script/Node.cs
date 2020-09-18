@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node {
-
+public class Node 
+{
+    // Properties for nodes
     public string Name;
     public int iGridX;//X Position in the Node Array
     public int iGridY;//Y Position in the Node Array

@@ -4,6 +4,7 @@ using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// Ignore this
 public class Navigation: MonoBehaviour
 {
     // Start is called before the first frame update

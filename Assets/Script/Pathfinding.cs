@@ -6,16 +6,28 @@ using UnityEngine;
 
 public class Pathfinding : MonoBehaviour
 {
-
     Grid GridReference;//For referencing the grid class
     public Transform StartPosition;//Starting position to pathfind from
     public Transform EndPosition;//Starting position to pathfind to
     public GameObject pathPrefab; //Path prefab goes here
+
+    // The parent Object that hold the children as the objdects must go through
     public Transform midpoint;
+
+    // The midpoint's children
     public List<Transform> targetPositions;
+
+    // Convert tarpgetPositions's position to grid's cell
     public List<Node> midPointNodes;
+
+    //This list contains the nodes in the grid that is marked as path, 
+    //all the nodes from tempPath are coppied to this list 
     private List<Node> FinalPath = new List<Node>();
+
+    //This list contains the nodes in the grid that is marked as path of pair of nodes from sortedNodes[i] to sortedNodes[i+1] 
     private List<Node> tempPath;
+
+    //This list contain the nodes that is sorted to be the shortest path
     private List<Node> sortedNodes = new List<Node>();
 
     private void Awake()//When the program starts
@@ -54,7 +66,7 @@ public class Pathfinding : MonoBehaviour
         Debug.Log($"Node Count: {midPointNodes.Count}");
         Debug.Log($"Midpointtransform Count: {targetPositions.Count}");
     }
-
+    // returns a node which is the position of a_TargetPos, use the FCost to determine the shortest
     Node FindPath(Vector3 a_StartPos, Vector3 a_TargetPos)
     {
         GridReference.ResetGrid();
@@ -109,10 +121,11 @@ public class Pathfinding : MonoBehaviour
         return TargetNode;
     }
 
+    //This method find the shortest path srom start, throughout the list of positions till the end
+    // Un-optimizzed, O(n^4)
     public void FindPathThroughTargets(Vector3 start, Vector3 end, List<Transform> midPoints)
     {
-
-        //Find the nearest point and stick it to the first position
+        //Find the nearest node from the starting point and stick it to the first position
         Node less = FindPath(start, midPointNodes[0].vPosition);
         int lessCost = less.FCost;
         for (int i = 0; i < midPointNodes.Count; i++)
@@ -128,12 +141,14 @@ public class Pathfinding : MonoBehaviour
             }
         }
         
+        //Use this to add the temporary path's nodes to the final one.
         FindPath(start, midPointNodes[0].vPosition);
         foreach (var item in tempPath)
         {
             FinalPath.Add(item);
         }
 
+        //Find the next nodes and stich it to the next+1 position
         for (int i = 0; i < midPointNodes.Count - 1; i++)
         {
             Node lessCostNode = FindPath(midPointNodes[i].vPosition, midPointNodes[i + 1].vPosition);
@@ -152,7 +167,8 @@ public class Pathfinding : MonoBehaviour
             }
         }
 
-
+        //Draw the line of node[i] to node[i+1], 
+        //by finding path to them and add the nodes in their temporary path to final path.
         for (int i = 0; i < midPointNodes.Count - 1; i++)
         {
             FindPath(midPointNodes[i].vPosition, midPointNodes[i + 1].vPosition);
@@ -162,41 +178,17 @@ public class Pathfinding : MonoBehaviour
             }
         }
 
+        //Find the last node to the End position
         FindPath(midPointNodes[midPointNodes.Count - 1].vPosition, EndPosition.position);
         foreach (var item in tempPath)
         {
             FinalPath.Add(item);
         }
-
     }
 
-    public void FindNearestNode(Node node, List<Node> midPointsNodes)
-    {
-        Node less = FindPath(node.vPosition, targetPositions[0].position);
-        int lessCost = less.FCost;
-        midPointNodes.Remove(node);
-
-
-        for (int i = 0; i < targetPositions.Count; i++)
-        {
-            Node temp = FindPath(node.vPosition, targetPositions[i].position);
-            int tempCost = temp.FCost;
-            if (!temp.Reached && tempCost < lessCost)
-            {
-                less = temp;
-            }
-        }
-        FindPath(node.vPosition, less.vPosition);
-        less.Reached = true;
-        foreach (var item in tempPath)
-        {
-            FinalPath.Add(item);
-        }
-    }
 
     public void GetFinalPath(Node a_StartingNode, Node a_EndNode)
     {
-        //FinalPath = new List<Node>();//List to hold the path sequentially 
         tempPath = new List<Node>();//List to hold the path temporary 
         Node CurrentNode = a_EndNode;//Node to store the current node being checked
 
@@ -205,15 +197,12 @@ public class Pathfinding : MonoBehaviour
             tempPath.Add(CurrentNode);//Add that node to the final path
             CurrentNode = CurrentNode.ParentNode;//Move onto its parent node
         }
-
         tempPath.Reverse();//Reverse the path to get the correct order
-
-
-
         GridReference.FinalPath = FinalPath;//Set the final path
 
     }
 
+    //Draw final path
     public void DrawFinalPath()
     {
         Debug.Log($"Final path Length: {FinalPath.Count}");
